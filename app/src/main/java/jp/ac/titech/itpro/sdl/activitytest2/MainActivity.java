@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v) {
+        Log.d(TAG, "onClick");
         switch (v.getId()) {
         case R.id.go_button:
             Intent intent = new Intent(this, InputActivity.class);
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int reqCode, int resCode, Intent data) {
+        Log.d(TAG, "onActivityResult");
         switch (reqCode) {
         case REQ_INPUT:
             if (resCode == RESULT_OK) {
@@ -83,5 +85,4 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         Log.d(TAG, "onDestroy");
     }
-
 }

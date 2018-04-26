@@ -30,6 +30,7 @@ public class InputActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v) {
+        Log.d(TAG, "onClick");
         switch (v.getId()) {
         case R.id.ok_button:
             String name = nameInput.getText().toString().trim();
