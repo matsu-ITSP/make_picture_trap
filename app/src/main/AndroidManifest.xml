@@ -16,9 +16,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".InputActivity">
+        <activity android:name=".NameInputActivity">
             <intent-filter>
-                <action android:name="jp.ac.titech.itpro.sdl.ACTION_NAME" />
+                <action android:name="jp.ac.titech.itpro.sdl.ACTION_NAMEINPUT" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

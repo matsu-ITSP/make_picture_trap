@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "onClick");
         switch (v.getId()) {
         case R.id.go_button:
-            Intent intent = new Intent(this, InputActivity.class);
+            Intent intent = new Intent(this, NameInputActivity.class);
             startActivityForResult(intent, REQ_NAME);
             break;
         }
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity
         switch (reqCode) {
         case REQ_NAME:
             if (resCode == RESULT_OK) {
-                String name = data.getStringExtra(InputActivity.NAME_EXTRA);
+                String name = data.getStringExtra(NameInputActivity.NAME_EXTRA);
                 if (name != null && name.length() > 0) {
                     answerText.setText(getString(R.string.answer_text_format, name));
                 }

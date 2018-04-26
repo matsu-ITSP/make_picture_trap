@@ -9,9 +9,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class InputActivity extends AppCompatActivity
+public class NameInputActivity extends AppCompatActivity
         implements View.OnClickListener {
-    private final static String TAG = "InputActivity";
+    private final static String TAG = "NameInputActivity";
     public final static String NAME_EXTRA = "name";
 
     private EditText nameInput;
@@ -20,7 +20,7 @@ public class InputActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-        setContentView(R.layout.activity_input);
+        setContentView(R.layout.activity_nameinput);
         TextView tagText = findViewById(R.id.input_tag_text);
         tagText.setText(TAG);
         nameInput = findViewById(R.id.name_input);
