@@ -6,50 +6,42 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity
+public class InputActivity extends AppCompatActivity
         implements View.OnClickListener {
-    private final static String TAG = "MainActivity";
-    private final static int REQ_INPUT = 1234;
+    private final static String TAG = "InputActivity";
+    public final static String NAME_EXTRA = "name";
 
-    private TextView answerText;
+    private EditText nameInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-        setContentView(R.layout.activity_main);
-        TextView tagText = findViewById(R.id.main_tag_text);
+        setContentView(R.layout.activity_input);
+        TextView tagText = findViewById(R.id.input_tag_text);
         tagText.setText(TAG);
-        answerText = findViewById(R.id.answer_text);
-        Button goButton = findViewById(R.id.go_button);
-        goButton.setOnClickListener(this);
+        nameInput = findViewById(R.id.name_input);
+        Button okButton = findViewById(R.id.ok_button);
+        okButton.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-        case R.id.go_button:
-            Intent intent = new Intent(this, InputActivity.class);
-            startActivityForResult(intent, REQ_INPUT);
-            break;
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int reqCode, int resCode, Intent data) {
-        switch (reqCode) {
-        case REQ_INPUT:
-            if (resCode == RESULT_OK) {
-                String name = data.getStringExtra(InputActivity.NAME_EXTRA);
-                if (name != null && name.length() > 0) {
-                    answerText.setText(getString(R.string.answer_text_format, name));
-                }
+        case R.id.ok_button:
+            String name = nameInput.getText().toString().trim();
+            if (name.length() > 0) {
+                Intent data = new Intent();
+                data.putExtra(NAME_EXTRA, name);
+                setResult(RESULT_OK, data);
             }
             else {
-                answerText.setText(R.string.answer_text_default);
+                setResult(RESULT_CANCELED);
             }
+            finish();
             break;
         }
     }
@@ -83,5 +75,4 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         Log.d(TAG, "onDestroy");
     }
-
 }
