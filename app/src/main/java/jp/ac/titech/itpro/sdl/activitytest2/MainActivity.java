@@ -11,7 +11,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener {
     private final static String TAG = "MainActivity";
-    private final static int REQ_INPUT = 1234;
+    private final static int REQ_NAME = 1234;
 
     private TextView answerText;
 
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity
         switch (v.getId()) {
         case R.id.go_button:
             Intent intent = new Intent(this, InputActivity.class);
-            startActivityForResult(intent, REQ_INPUT);
+            startActivityForResult(intent, REQ_NAME);
             break;
         }
     }
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int reqCode, int resCode, Intent data) {
         Log.d(TAG, "onActivityResult");
         switch (reqCode) {
-        case REQ_INPUT:
+        case REQ_NAME:
             if (resCode == RESULT_OK) {
                 String name = data.getStringExtra(InputActivity.NAME_EXTRA);
                 if (name != null && name.length() > 0) {
