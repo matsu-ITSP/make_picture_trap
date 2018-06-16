@@ -9,9 +9,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class NameInputActivity extends AppCompatActivity
+public class FlickListenActivity extends AppCompatActivity
         implements View.OnClickListener {
-    private final static String TAG = "NameInputActivity";
+    private final static String TAG = "FlickListenActivity";
     public final static String NAME_EXTRA = "name";
 
     private EditText nameInput;

@@ -16,7 +16,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NameInputActivity">
+        <activity android:name=".FlickListenActivity">
             <intent-filter>
                 <action android:name="jp.ac.titech.itpro.sdl.ACTION_NAMEINPUT" />
                 <category android:name="android.intent.category.DEFAULT" />

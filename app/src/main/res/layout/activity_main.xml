@@ -15,8 +15,7 @@
         android:textSize="@dimen/output_text_size"
         app:layout_constraintBottom_toTopOf="@+id/go_button"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/main_tag_text" />
+        app:layout_constraintRight_toRightOf="parent" />
 
     <Button
         android:id="@+id/go_button"
@@ -29,15 +28,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/main_tag_text"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/widget_default_margin"
-        android:text="@string/tag_text_default"
-        android:textSize="@dimen/tag_text_size"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+    <ImageView
+        android:id="@+id/image_view"
+        android:scaleType="center"
+        android:contentDescription="@string/description"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </android.support.constraint.ConstraintLayout>

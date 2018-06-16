@@ -1,9 +1,11 @@
 <resources>
-    <string name="app_name">ActivityTest2</string>
+    <string name="app_name">TestIntentGallery</string>
     <string name="tag_text_default">TAG</string>
-    <string name="answer_text_default">Press GO and input your name</string>
+    <string name="answer_text_default">Press select picture</string>
     <string name="answer_text_format">Hello %s,\nNice to see you.</string>
     <string name="name_input_hint">Name</string>
-    <string name="go_button_label">GO</string>
+    <string name="go_button_label">Select</string>
     <string name="ok_button_label">OK</string>
+    <string name="button">Get Image</string>
+    <string name="description">a picture</string>
 </resources>
