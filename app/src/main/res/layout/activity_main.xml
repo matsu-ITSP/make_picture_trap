@@ -5,25 +5,56 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-
-    <Button
-        android:id="@+id/go_button"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/widget_default_margin"
-        android:text="@string/go_button_label"
-        android:textSize="@dimen/button_label_text_size"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+        <Button
+            android:id="@+id/back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/widget_default_margin"
+            android:text="@string/back_button_label"
+            android:textSize="@dimen/button_label_text_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
+        <Button
+            android:id="@+id/go_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/widget_default_margin"
+            android:text="@string/go_button_label"
+            android:textSize="@dimen/button_label_text_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/widget_default_margin"
+            android:text="@string/save_button_label"
+            android:textSize="@dimen/button_label_text_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+    </LinearLayout>
     <ImageView
         android:id="@+id/image_view"
         android:scaleType="center"
         android:contentDescription="@string/description"
         android:layout_margin="10dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:translationZ="-2dp" tools:targetApi="lollipop"/>
     <TextView
         android:id="@+id/answer_text"
         android:layout_width="wrap_content"
@@ -31,7 +62,7 @@
         android:layout_margin="@dimen/widget_default_margin"
         android:text="@string/answer_text_default"
         android:textSize="@dimen/output_text_size"
-        app:layout_constraintBottom_toTopOf="@+id/go_button"
+        app:layout_constraintBottom_toTopOf="@+id/buttons"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 </android.support.constraint.ConstraintLayout>
