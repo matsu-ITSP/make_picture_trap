@@ -6,6 +6,9 @@ android {
         applicationId "jp.ac.titech.itpro.sdl.activitytest2"
         minSdkVersion 15
         targetSdkVersion 27
+        renderscriptTargetApi 18
+        renderscriptSupportModeEnabled true
+        renderscriptNdkModeEnabled false
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

@@ -26,6 +26,7 @@ import android.graphics.Bitmap.CompressFormat;
 import android.os.Environment;
 import android.content.*;
 import android.widget.Toast;
+import android.support.v8.renderscript.*;
 
 import java.io.BufferedOutputStream;
 import java.io.FileDescriptor;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private GestureDetector myGesDetect;
     boolean isFlick = false;
     Uri originalImage;
+    RenderScript rs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG,"onCreate");
@@ -71,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
         * */
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        rs = RenderScript.create(this);
 
         textView = findViewById(R.id.answer_text);
         imageView = findViewById(R.id.image_view);
@@ -129,6 +133,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG,"onClick_save");
 
                 // 画像を置く外部ストレージのパスを設定
+                //todo:タイトルをyakudo_(今日の日付).jpgにする
+                //Date dt = new Date();
+                //SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd_hhmmss");
                 String fileName = "poi.jpg";
                 String filePath = Environment.getExternalStorageDirectory().getPath()
                         + "/DCIM/Camera/"+fileName;
@@ -239,9 +246,22 @@ public class MainActivity extends AppCompatActivity {
 
         int width = mutableBitmap.getWidth();
         int height = mutableBitmap.getHeight();
+
+        Allocation alloc = Allocation.createFromBitmap(rs,mutableBitmap);//アロケーションにデータを入れる
+        //ScriptC_invert invert = new ScriptC_invert(rs);
+        ScriptC_saturation scr = new ScriptC_saturation(rs);
+        scr.set_saturationValue(1000);
+        scr.forEach_saturation(alloc,alloc);
+
+        //ScriptIntrinsicBlur blur = ScriptIntrinsicBlur.create(rs,Element.RGBA_8888(rs));
+        //blur.setInput(alloc);
+        //blur.forEach(alloc);
+        alloc.copyTo(mutableBitmap);
+
         //Log.d("Main_where heavy","計算開始");
         //計算がとても重い、描画は大したことない
-        //計算をGPUで行うべき
+        //計算をGPUで行うべき,並列化したい！
+        /*
         for (int i = 0; i < 1000; i++) {
             for (int j = 0; j < 1000; j++) {
 
@@ -258,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
                 mutableBitmap.setPixel(i, j, gray_rgb);
             }
         }
+        */
         /*
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
