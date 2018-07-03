@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
@@ -27,6 +28,7 @@ import android.os.Environment;
 import android.content.*;
 import android.widget.Toast;
 import android.support.v8.renderscript.*;
+import android.support.v8.renderscript.ScriptIntrinsicConvolve5x5;
 
 import java.io.BufferedOutputStream;
 import java.io.FileDescriptor;
@@ -242,43 +244,67 @@ public class MainActivity extends AppCompatActivity {
         //引用:http://java-lang-programming.com/ja/articles/80
         //グレースケールに変える、躍動するのはまだ
         //todo:躍動させる
+        /*
+        //bitmapを平行移動してから重ねる->メモリ不足で落ちる
+        final int COPYNUM = 5;
+        Bitmap maps[] = new Bitmap[5];
+        Canvas tempCanvas;
+        ImageView tempImageView;
+        for(int i = 0 ; i < COPYNUM ; i++) {
+            maps[i] = getMutableBitmap();
+            tempCanvas = new Canvas(maps[i]);
+            tempCanvas.translate(px,py);
+
+            //maps[i] =
+        }*/
         Bitmap mutableBitmap = getMutableBitmap();
 
         int width = mutableBitmap.getWidth();
         int height = mutableBitmap.getHeight();
 
-        Allocation alloc = Allocation.createFromBitmap(rs,mutableBitmap);//アロケーションにデータを入れる
-        //ScriptC_invert invert = new ScriptC_invert(rs);
+        Allocation inAlloc = Allocation.createFromBitmap(rs,mutableBitmap);//アロケーションにデータを入れる
+        Allocation outAlloc = Allocation.createTyped(rs,inAlloc.getType());
+        /*
         ScriptC_saturation scr = new ScriptC_saturation(rs);
         scr.set_saturationValue(1000);
-        scr.forEach_saturation(alloc,alloc);
+        scr.forEach_saturation(inAlloc,outAlloc);
+        */
+        final ScriptIntrinsicConvolve3x3 conv = ScriptIntrinsicConvolve3x3.create(rs,Element.U8_4(rs));
+        conv.setInput(inAlloc);
+        //todo:明るく・シャープにしてからこいつを複数回適応
+        //todo:横とか斜め方向に動く配列作る
+        final float[] yakudo = new float[]{
+                0,0.101f,0,
+                0,0.300f,0,
+                0,0.599f,0
+        };
+        final float[] shape = new float[]{
+                0,-1,0,
+                -1,5,-1,
+                0,-1,0
+        };
+        final float LIGHT = 0.05f;
 
+        conv.setCoefficients(shape);
+        conv.forEach(inAlloc);
+        conv.setCoefficients(yakudo);
+        //yakudoを50回適応
+        for(int i = 0 ; i < 50 ; i++) {
+            conv.forEach(inAlloc);
+        }
+        ScriptC_light scr = new ScriptC_light(rs);
+        scr.set_light(LIGHT);
+        scr.set_MAX(255);
+        scr.forEach_saturation(inAlloc,inAlloc);
+        conv.forEach(outAlloc);
         //ScriptIntrinsicBlur blur = ScriptIntrinsicBlur.create(rs,Element.RGBA_8888(rs));
         //blur.setInput(alloc);
         //blur.forEach(alloc);
-        alloc.copyTo(mutableBitmap);
+        outAlloc.copyTo(mutableBitmap);
 
         //Log.d("Main_where heavy","計算開始");
         //計算がとても重い、描画は大したことない
         //計算をGPUで行うべき,並列化したい！
-        /*
-        for (int i = 0; i < 1000; i++) {
-            for (int j = 0; j < 1000; j++) {
-
-                // Returns the Color at the specified location.
-                int pixel = mutableBitmap.getPixel(i, j);
-
-                int red = 0;
-                int green = 0;
-                int blue = 0;
-
-                int average = (red + green + blue) / 3;
-                int gray_rgb = Color.rgb(average, average, average);
-
-                mutableBitmap.setPixel(i, j, gray_rgb);
-            }
-        }
-        */
         /*
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
