@@ -39,7 +39,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.io.FileOutputStream;
-
+import java.lang.Math;
 
 
 import java.util.Locale;
@@ -262,21 +262,12 @@ public class MainActivity extends AppCompatActivity {
         int width = mutableBitmap.getWidth();
         int height = mutableBitmap.getHeight();
 
-        Allocation inAlloc = Allocation.createFromBitmap(rs,mutableBitmap);//アロケーションにデータを入れる
-        Allocation outAlloc = Allocation.createTyped(rs,inAlloc.getType());
-        /*
-        ScriptC_saturation scr = new ScriptC_saturation(rs);
-        scr.set_saturationValue(1000);
-        scr.forEach_saturation(inAlloc,outAlloc);
-        */
-        final ScriptIntrinsicConvolve3x3 conv = ScriptIntrinsicConvolve3x3.create(rs,Element.U8_4(rs));
-        conv.setInput(inAlloc);
-        //todo:明るく・シャープにしてからこいつを複数回適応
+
         //todo:横とか斜め方向に動く配列作る
-        final float[] yakudo = new float[]{
-                0,0.101f,0,
-                0,0.300f,0,
-                0,0.599f,0
+        final float[] originYakudo = new float[]{
+                0,0,0,
+                0.101f,0.300f,0.599f,
+                0,0,0
         };
         final float[] shape = new float[]{
                 0,-1,0,
@@ -284,19 +275,38 @@ public class MainActivity extends AppCompatActivity {
                 0,-1,0
         };
         final float LIGHT = 0.05f;
-
+        float yakudo[] = new float[9];
+        double radian = Math.atan2(vy,vx);
+        if(radian < 0) radian += 2 * Math.PI;
+        yakudo = makeYakudoMatrix(originYakudo,radian);
+        for(int i = 0 ; i < 9 ; i++) {
+            Log.d(TAG,String.valueOf(yakudo[i]));
+        }
+        Allocation inAlloc = Allocation.createFromBitmap(rs,mutableBitmap);//アロケーションにデータを入れる
+        Allocation outAlloc = Allocation.createTyped(rs,inAlloc.getType());
+        /*
+        ScriptC_saturation scr = new ScriptC_saturation(rs);
+        scr.set_saturationValue(1000);
+        scr.forEach_saturation(inAlloc,outAlloc);
+        */
+        //まずはshapeに
+        final ScriptIntrinsicConvolve3x3 conv = ScriptIntrinsicConvolve3x3.create(rs,Element.U8_4(rs));
+        conv.setInput(inAlloc);
         conv.setCoefficients(shape);
-        conv.forEach(inAlloc);
+        conv.forEach(inAlloc);//シャープにする処理
+
+        //躍動処理
         conv.setCoefficients(yakudo);
         //yakudoを50回適応
         for(int i = 0 ; i < 50 ; i++) {
             conv.forEach(inAlloc);
         }
+
         ScriptC_light scr = new ScriptC_light(rs);
         scr.set_light(LIGHT);
         scr.set_MAX(255);
         scr.forEach_saturation(inAlloc,inAlloc);
-        conv.forEach(outAlloc);
+        conv.forEach(outAlloc);//明るくする
         //ScriptIntrinsicBlur blur = ScriptIntrinsicBlur.create(rs,Element.RGBA_8888(rs));
         //blur.setInput(alloc);
         //blur.forEach(alloc);
@@ -326,6 +336,85 @@ public class MainActivity extends AppCompatActivity {
         //Log.d("Main_where heavy","計算終了");
         imageView.setImageBitmap(mutableBitmap);
         //Log.d("Main_where heavy","描画終了");
+    }
+    private float[] makeYakudoMatrix(float[] origin , double radian) {
+        //左上と右下はいける
+        Log.d(TAG,"makeYakudoMatrix_start");
+        float[] anstemp = new float[9];
+        float[] ans = new float[9];
+        for(int i = 0 ; i < 9 ; i++){
+            anstemp[i]=0;
+            ans[i] = 0;
+        }
+        anstemp[4] = origin[4];
+        float t;
+        double degree = Math.toDegrees(radian);
+        Log.d(TAG,"makeYakudoMatrix_defset,deg=" + String.valueOf(degree));
+        //58'あたりがやばい
+        if(radian < Math.PI * 0.25f) {
+            t = (float) Math.tan(radian);
+            anstemp[5] = origin[5] * (1.00f-t);
+            anstemp[2] = origin[5] * t;
+            anstemp[3] = origin[3] * (1.00f-t);
+            anstemp[6] = origin[3] * t;
+        }else if(radian < Math.PI * 0.50f){
+            t = (float) Math.tan(Math.PI * 0.50f - radian);
+            anstemp[1] = origin[5] * (1.00f-t);
+            anstemp[2] = origin[5] * t;
+            anstemp[7] = origin[3] * (1.00f-t);
+            anstemp[6] = origin[3] * t;
+        }else if(radian < Math.PI * 0.75f){
+            t = (float) Math.tan(radian - Math.PI * 0.50f);
+            anstemp[1] = origin[5] * (1.00f-t);
+            anstemp[0] = origin[5] * t;
+            anstemp[7] = origin[3] * (1.00f-t);
+            anstemp[8] = origin[3] * t;
+        }else if(radian < Math.PI){
+            t = (float) Math.tan(Math.PI - radian);
+            anstemp[3] = origin[5] * (1.00f-t);
+            anstemp[0] = origin[5] * t;
+            anstemp[5] = origin[3] * (1.00f-t);
+            anstemp[8] = origin[3] * t;
+        }else if(radian < Math.PI * 1.25f){
+            t = (float) Math.tan(radian - Math.PI);
+            anstemp[3] = origin[5] * (1.00f-t);
+            anstemp[6] = origin[5] * t;
+            anstemp[5] = origin[3] * (1.00f-t);
+            anstemp[2] = origin[3] * t;
+        }else if(radian < Math.PI * 1.50f){
+            t = (float) Math.tan(Math.PI * 0.50f - (radian - Math.PI));
+            anstemp[7] = origin[5] * (1.00f-t);
+            anstemp[6] = origin[5] * t;
+            anstemp[1] = origin[3] * (1-t);
+            anstemp[2] = origin[3] * t;
+        }else if(radian < Math.PI * 1.75f){
+            t = (float) Math.tan(radian - Math.PI - Math.PI * 0.50f);
+            anstemp[7] = origin[5] * (1.00f-t);
+            anstemp[8] = origin[5] * t;
+            anstemp[1] = origin[3] * (1.00f-t);
+            anstemp[0] = origin[3] * t;
+        }else if(radian < Math.PI * 2.00f){
+            t = (float) Math.tan(Math.PI - (radian - Math.PI));
+            anstemp[5] = origin[5] * (1.00f-t);
+            anstemp[8] = origin[5] * t;
+            anstemp[3] = origin[3] * (1.00f-t);
+            anstemp[0] = origin[3] * t;
+        }else {
+            Log.d(TAG,"makeYakudomatrix_end");
+            return origin;
+        }
+        //向きを正しくする
+        ans[6] = anstemp[0];
+        ans[7] = anstemp[1];
+        ans[8] = anstemp[2];
+        ans[3] = anstemp[3];
+        ans[4] = anstemp[4];
+        ans[5] = anstemp[5];
+        ans[0] = anstemp[6];
+        ans[1] = anstemp[7];
+        ans[2] = anstemp[8];
+        Log.d(TAG,"makeYakudomatrix_end");
+        return ans;
     }
     private Bitmap getMutableBitmap() {
         BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
