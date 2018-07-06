@@ -135,10 +135,11 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG,"onClick_save");
 
                 // 画像を置く外部ストレージのパスを設定
-                //todo:タイトルをyakudo_(今日の日付).jpgにする
-                //Date dt = new Date();
-                //SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd_hhmmss");
-                String fileName = "poi.jpg";
+                Date dt = new Date();
+                SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd_hhmmss");
+                String dateName = fmt.format(dt);
+                String fileName = "yakudo" + dateName + ".jpg";
+
                 String filePath = Environment.getExternalStorageDirectory().getPath()
                         + "/DCIM/Camera/"+fileName;
                 File file = new File(filePath);
@@ -228,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
                 float velocity_x = (velocityX);
                 float distance_y = ((event1.getY() - event2.getY()));
                 float velocity_y = (velocityY);
-                textView.setText("distance:(" + distance_x + "," + distance_y + " )speed:(" + velocity_x + "," + velocity_y +")");
+                //textView.setText("distance:(" + distance_x + "," + distance_y + " )speed:(" + velocity_x + "," + velocity_y +")");
 
                 editImage(velocity_x,velocity_y,event1.getX(),event1.getY());
                 toSave();
@@ -241,32 +242,14 @@ public class MainActivity extends AppCompatActivity {
         }
     };
     private void editImage(float vx,float vy,float px,float py){
-        //引用:http://java-lang-programming.com/ja/articles/80
-        //グレースケールに変える、躍動するのはまだ
-        //todo:躍動させる
-        /*
-        //bitmapを平行移動してから重ねる->メモリ不足で落ちる
-        final int COPYNUM = 5;
-        Bitmap maps[] = new Bitmap[5];
-        Canvas tempCanvas;
-        ImageView tempImageView;
-        for(int i = 0 ; i < COPYNUM ; i++) {
-            maps[i] = getMutableBitmap();
-            tempCanvas = new Canvas(maps[i]);
-            tempCanvas.translate(px,py);
-
-            //maps[i] =
-        }*/
         Bitmap mutableBitmap = getMutableBitmap();
 
         int width = mutableBitmap.getWidth();
         int height = mutableBitmap.getHeight();
 
-
-        //todo:横とか斜め方向に動く配列作る
         final float[] originYakudo = new float[]{
                 0,0,0,
-                0.101f,0.300f,0.599f,
+                0.101f,0.410f,0.489f,
                 0,0,0
         };
         final float[] shape = new float[]{
@@ -284,11 +267,7 @@ public class MainActivity extends AppCompatActivity {
         }
         Allocation inAlloc = Allocation.createFromBitmap(rs,mutableBitmap);//アロケーションにデータを入れる
         Allocation outAlloc = Allocation.createTyped(rs,inAlloc.getType());
-        /*
-        ScriptC_saturation scr = new ScriptC_saturation(rs);
-        scr.set_saturationValue(1000);
-        scr.forEach_saturation(inAlloc,outAlloc);
-        */
+
         //まずはshapeに
         final ScriptIntrinsicConvolve3x3 conv = ScriptIntrinsicConvolve3x3.create(rs,Element.U8_4(rs));
         conv.setInput(inAlloc);
@@ -301,16 +280,14 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0 ; i < 50 ; i++) {
             conv.forEach(inAlloc);
         }
-
+        //明るくする
         ScriptC_light scr = new ScriptC_light(rs);
         scr.set_light(LIGHT);
         scr.set_MAX(255);
         scr.forEach_saturation(inAlloc,inAlloc);
         conv.forEach(outAlloc);//明るくする
-        //ScriptIntrinsicBlur blur = ScriptIntrinsicBlur.create(rs,Element.RGBA_8888(rs));
-        //blur.setInput(alloc);
-        //blur.forEach(alloc);
-        outAlloc.copyTo(mutableBitmap);
+
+        outAlloc.copyTo(mutableBitmap);//処理終了、コピー
 
         //Log.d("Main_where heavy","計算開始");
         //計算がとても重い、描画は大したことない
@@ -350,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
         float t;
         double degree = Math.toDegrees(radian);
         Log.d(TAG,"makeYakudoMatrix_defset,deg=" + String.valueOf(degree));
-        //58'あたりがやばい
+
         if(radian < Math.PI * 0.25f) {
             t = (float) Math.tan(radian);
             anstemp[5] = origin[5] * (1.00f-t);
@@ -462,6 +439,7 @@ public class MainActivity extends AppCompatActivity {
     //状態遷移関数
     private void toSelect(){
         Log.d(TAG,"toSelect");
+        textView.setText(R.string.message_Select);
         View go_button = findViewById(R.id.go_button);
         go_button.setClickable(true);
         View back = findViewById(R.id.back_button);
@@ -475,6 +453,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void toFlick(){
         Log.d(TAG,"toFlick");
+        textView.setText(R.string.message_Flick);
         View go_button = findViewById(R.id.go_button);
         go_button.setClickable(true);
         View back = findViewById(R.id.back_button);
@@ -485,6 +464,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void toSave(){
         Log.d(TAG,"toSave");
+        textView.setText(R.string.message_Save);
         View go_button = findViewById(R.id.go_button);
         go_button.setClickable(false);
         View back = findViewById(R.id.back_button);

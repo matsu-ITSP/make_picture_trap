@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TestIntentGallery</string>
+    <string name="app_name">MakeYakudo</string>
     <string name="tag_text_default">TAG</string>
     <string name="answer_text_default">Press select picture</string>
     <string name="answer_text_format">Hello %s,\nNice to see you.</string>
@@ -10,4 +10,7 @@
     <string name="ok_button_label">OK</string>
     <string name="button">Get Image</string>
     <string name="description">a picture</string>
+    <string name="message_Select">select picture</string>
+    <string name="message_Flick">flick to yakudo</string>
+    <string name="message_Save">save or back</string>
 </resources>
