@@ -8,9 +8,11 @@
     <string name="back_button_label">back</string>
     <string name="save_button_label">save</string>
     <string name="ok_button_label">OK</string>
+    <string name="tweet_button_label">tweet</string>
     <string name="button">Get Image</string>
     <string name="description">a picture</string>
     <string name="message_Select">select picture</string>
     <string name="message_Flick">flick to yakudo</string>
     <string name="message_Save">save or back</string>
+
 </resources>

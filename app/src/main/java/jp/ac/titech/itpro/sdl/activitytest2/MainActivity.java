@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private GestureDetector myGesDetect;
     boolean isFlick = false;
     Uri originalImage;
+    String yakudoImagePath;
     RenderScript rs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         go_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.d(TAG,"onClick_select");
+                    //画像を選ぶ画面を起動
                     Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
                     intent.setType("*/*");
@@ -170,7 +172,20 @@ public class MainActivity extends AppCompatActivity {
                 toSelect();
             }
         });
+        Button tweet_button = findViewById(R.id.tweet_button);
+        tweet_button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Log.d(TAG,"onClick_tweet");
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                String message = Uri.encode("#traP1yakudo");
+                intent.setData(Uri.parse("twitter://post?message=" + message));
+                startActivity(intent);
+
+            }
+        });
         myGesDetect = new GestureDetector(this,myOnGesListener);
+        toSelect();
+        tweet_button.setClickable(false);//最初のselect画面のときのみtweetは不可
 
     }
 
@@ -272,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
         final ScriptIntrinsicConvolve3x3 conv = ScriptIntrinsicConvolve3x3.create(rs,Element.U8_4(rs));
         conv.setInput(inAlloc);
         conv.setCoefficients(shape);
-        conv.forEach(inAlloc);//シャープにする処理
+        conv.forEach(inAlloc);
 
         //躍動処理
         conv.setCoefficients(yakudo);
@@ -285,32 +300,10 @@ public class MainActivity extends AppCompatActivity {
         scr.set_light(LIGHT);
         scr.set_MAX(255);
         scr.forEach_saturation(inAlloc,inAlloc);
-        conv.forEach(outAlloc);//明るくする
+        conv.forEach(outAlloc);
 
         outAlloc.copyTo(mutableBitmap);//処理終了、コピー
 
-        //Log.d("Main_where heavy","計算開始");
-        //計算がとても重い、描画は大したことない
-        //計算をGPUで行うべき,並列化したい！
-        /*
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-
-                // Returns the Color at the specified location.
-                int pixel = mutableBitmap.getPixel(i, j);
-
-                int red = Color.red(pixel);
-                int green = Color.green(pixel);
-                int blue = Color.blue(pixel);
-
-                int average = (red + green + blue) / 3;
-                int gray_rgb = Color.rgb(average, average, average);
-
-                mutableBitmap.setPixel(i, j, gray_rgb);
-            }
-        }
-        */
-        //Log.d("Main_where heavy","計算終了");
         imageView.setImageBitmap(mutableBitmap);
         //Log.d("Main_where heavy","描画終了");
     }
@@ -442,6 +435,8 @@ public class MainActivity extends AppCompatActivity {
         textView.setText(R.string.message_Select);
         View go_button = findViewById(R.id.go_button);
         go_button.setClickable(true);
+        View tweet_button = findViewById(R.id.tweet_button);
+        tweet_button.setClickable(true);
         View back = findViewById(R.id.back_button);
         back.setClickable(false);
         View save = findViewById(R.id.save_button);
@@ -456,6 +451,8 @@ public class MainActivity extends AppCompatActivity {
         textView.setText(R.string.message_Flick);
         View go_button = findViewById(R.id.go_button);
         go_button.setClickable(true);
+        View tweet_button = findViewById(R.id.tweet_button);
+        tweet_button.setClickable(false);
         View back = findViewById(R.id.back_button);
         back.setClickable(false);
         View save = findViewById(R.id.save_button);
@@ -467,6 +464,8 @@ public class MainActivity extends AppCompatActivity {
         textView.setText(R.string.message_Save);
         View go_button = findViewById(R.id.go_button);
         go_button.setClickable(false);
+        View tweet_button = findViewById(R.id.tweet_button);
+        tweet_button.setClickable(false);
         View back = findViewById(R.id.back_button);
         back.setClickable(true);
         View save = findViewById(R.id.save_button);
